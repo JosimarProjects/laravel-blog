@@ -5,19 +5,22 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use Cviebrock\EloquentSluggable\Services\SlugService;
+use App\Http\Services\PostService;
 
 class PostController extends Controller
 {
+    public function __construct(){
+        $this->middleware('auth', ['except' => ['index', 'show']]);
+    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\Response
      */
-    public function index()
+    public function index(PostService $service)
     {
-
-        return view('blog.index')
-            ->with('posts', Post::orderBy('updated_at', 'DESC')->get());
+        $post = $service->getAll();
+        return view('blog.index', ['posts' => $post]);
     }
 
     /**
@@ -64,12 +67,10 @@ class PostController extends Controller
      * @param  string  $slug
      * @return \Illuminate\Http\Response
      */
-    public function show(string $slug)
+    public function show(string $slug, PostService $service)
     {
-        //
-        return view('blog.show')
-            ->with('post', Post::where('slug', $slug)->first());
-
+        $post = $service->getById($slug);
+        return view('blog.show', ['post' => $post]);
     }
 
     /**
@@ -78,10 +79,11 @@ class PostController extends Controller
      * @param  string  $slug
      * @return \Illuminate\Http\Response
      */
-    public function edit(string $slug)
+    public function edit(string $slug, PostService $service)
     {
-        return view('blog.edit')
-            ->with('post', Post::where('slug', $slug)->first());
+        $post = $service->getById($slug);
+        return view('blog.edit', ['post' => $post]);
+
     }
 
     /**
@@ -116,11 +118,10 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($slug)
+    public function destroy(string $slug , PostService $service)
     {
-        $post = Post::where('slug', $slug);
-        $post->delete();
-
+        $service->delete($slug);
         return redirect('blog')->with('message', 'Your post has been deleted!');
     }
+  
 }
