@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Post;
-use Cviebrock\EloquentSluggable\Services\SlugService;
+
 use App\Http\Services\PostService;
+use App\Http\Requests\CreatePostRequest;
+
+
 
 class PostController extends Controller
 {
@@ -39,26 +42,10 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreatePostRequest $request , PostService $service)
     {
-        $request->validate([
-            'title' => 'required',
-            'description' => 'required',
-            'image' => 'required|mimes:jpg,png,jpeg|max:5048'
-        ]);
-
-        $newImageName = uniqid(). '-' .$request->title . '.' . $request->image->extension();
-        $request->image->move(public_path('images'), $newImageName);
-        $slug = SlugService::createSlug(Post::class, 'slug', $request->title);
-        Post::create([
-            'title' => $request->input('title'),
-            'description' => $request->input('description'),
-            'slug' => $slug,
-            'image_path' => $newImageName,
-            'user_id' => auth()->user()->id
-        ]);
-        return redirect('/blog')
-            ->with('message', 'Your post has been added!');
+        $service->create($request);
+        return redirect('/blog')->with('message', 'Your post has been added!');
     }
 
     /**
@@ -83,7 +70,6 @@ class PostController extends Controller
     {
         $post = $service->getById($slug);
         return view('blog.edit', ['post' => $post]);
-
     }
 
     /**
@@ -123,5 +109,5 @@ class PostController extends Controller
         $service->delete($slug);
         return redirect('blog')->with('message', 'Your post has been deleted!');
     }
-  
+
 }

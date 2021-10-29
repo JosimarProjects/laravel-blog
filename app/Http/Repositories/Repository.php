@@ -3,6 +3,7 @@
 namespace App\Http\Repositories;
 
 use App\Models\Post;
+use Cviebrock\EloquentSluggable\Services\SlugService;
 
 
  class Repository
@@ -24,8 +25,14 @@ use App\Models\Post;
         return $this->model->where('slug', $slug)->first();
     }
 
-    public function create(array $data)
+    public function createSlug($title)
     {
+      return SlugService::createSlug(Post::class, 'slug',$title);
+    }
+
+    public function create(array $data )
+    {
+        
         return $this->model->create($data);
     }
 
