@@ -32,14 +32,21 @@ use Cviebrock\EloquentSluggable\Services\SlugService;
 
     public function create(array $data )
     {
-        
+
         return $this->model->create($data);
     }
 
-    public function update($id, array $data)
+    public function update($slug,  $request)
     {
-        $record = $this->model->find($id);
-        return $record->update($data);
+         return $this->model->where('slug', $slug)
+            ->update(
+                [ 'title' => $request->input('title'),
+                    'description' => $request->input('description'),
+                    'slug' => $slug,
+                    'user_id' => auth()->user()->id]
+            );
+
+
     }
 
     public function delete($slug)

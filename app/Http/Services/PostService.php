@@ -49,6 +49,10 @@ class PostService
         return $this->repository->delete($slug);
     }
 
+    public function update($request, $slug){
+        $post = $this->repository->update($slug, $request);
+    }
+
 }
 
 
