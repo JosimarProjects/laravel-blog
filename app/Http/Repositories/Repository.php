@@ -22,7 +22,7 @@ use Cviebrock\EloquentSluggable\Services\SlugService;
 
     public function find($slug)
     {
-        return $this->model->where('slug', $slug)->first();
+        return $this->model->postbySlug($slug)->first();
     }
 
     public function createSlug($title)
@@ -32,26 +32,23 @@ use Cviebrock\EloquentSluggable\Services\SlugService;
 
     public function create(array $data )
     {
-
         return $this->model->create($data);
     }
 
     public function update($slug,  $request)
     {
-         return $this->model->where('slug', $slug)
+         return $this->model->postbySlug($slug)
             ->update(
                 [ 'title' => $request->input('title'),
                     'description' => $request->input('description'),
                     'slug' => $slug,
                     'user_id' => auth()->user()->id]
             );
-
-
     }
 
     public function delete($slug)
     {
-        $record =  $this->model->where('slug', $slug)->first();
+        $record =  $this->model->postbySlug($slug)->first();
         return $record->delete();
     }
 }

@@ -24,7 +24,11 @@ class Post extends Model
             'slug' => [
                 'source' => 'title'
             ]
-
         ];
+    }
+
+    public function scopePostBySlug($query, $slug)
+    {
+       return $query->where('slug', $slug);
     }
 }

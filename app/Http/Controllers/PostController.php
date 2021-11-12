@@ -12,7 +12,11 @@ use App\Http\Requests\CreatePostRequest;
 
 class PostController extends Controller
 {
-    public function __construct(){
+    protected $service;
+
+    public function __construct(PostService $service)
+    {
+        $this->service = $service;
         $this->middleware('auth', ['except' => ['index', 'show']]);
     }
     /**
@@ -20,9 +24,9 @@ class PostController extends Controller
      *
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\Response
      */
-    public function index(PostService $service)
+    public function index()
     {
-        $post = $service->getAll();
+        $post = $this->service->getAll();
         return view('blog.index', ['posts' => $post]);
     }
 
@@ -42,9 +46,9 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(CreatePostRequest $request , PostService $service)
+    public function store(CreatePostRequest $request)
     {
-        $service->create($request);
+        $this->service->create($request);
         return redirect('/blog')->with('message', 'Your post has been added!');
     }
 
@@ -54,9 +58,9 @@ class PostController extends Controller
      * @param  string  $slug
      * @return \Illuminate\Http\Response
      */
-    public function show(string $slug, PostService $service)
+    public function show(string $slug)
     {
-        $post = $service->getById($slug);
+        $post = $this->service->getById($slug);
         return view('blog.show', ['post' => $post]);
     }
 
@@ -66,9 +70,9 @@ class PostController extends Controller
      * @param  string  $slug
      * @return \Illuminate\Http\Response
      */
-    public function edit(string $slug, PostService $service)
+    public function edit(string $slug)
     {
-        $post = $service->getById($slug);
+        $post = $this->service->getById($slug);
         return view('blog.edit', ['post' => $post]);
     }
 
@@ -79,9 +83,9 @@ class PostController extends Controller
      * @param  string  $slug
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $slug, PostService $service)
+    public function update(Request $request, $slug)
     {
-        $service->update($request, $slug);
+        $this->service->update($request, $slug);
         return redirect('/blog')->with('message', 'Your post has been updated!');
     }
 
@@ -91,10 +95,9 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(string $slug , PostService $service)
+    public function destroy(string $slug)
     {
-        $service->delete($slug);
+        $this->service->delete($slug);
         return redirect('blog')->with('message', 'Your post has been deleted!');
     }
-
 }
